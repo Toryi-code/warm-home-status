@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f4ed">
+  <title>正在打开 WARM HOME</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;color:#30362e;background:#f7f4ed}
+    *{box-sizing:border-box}body{min-height:100dvh;margin:0;display:grid;place-items:center;padding:24px}
+    main{width:min(100%,480px);padding:42px 34px;background:#fffdfa;border:1px solid #e9e7de;border-radius:24px;box-shadow:0 20px 48px #39463210;text-align:center}
+    .mark{width:54px;height:54px;margin:0 auto 26px;border-radius:15px;background:#72876e;color:white;display:grid;place-items:center;font-size:28px;font-weight:750}
+    .eyebrow{color:#72876e;font-size:13px;font-weight:700;letter-spacing:.09em}h1{font-size:clamp(25px,6vw,34px);line-height:1.35;margin:12px 0 14px}
+    p{color:#687067;font-size:16px;line-height:1.8;margin:0 auto 25px;max-width:360px}
+    .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}button,a.button{min-height:46px;padding:11px 20px;border-radius:12px;font:inherit;font-size:15px;cursor:pointer;text-decoration:none}
+    button{border:0;background:#72876e;color:#fff}button:hover{background:#60775d}a.button{border:1px solid #dddcd2;color:#526650;background:#fff}
+    .fine{margin:25px 0 0;font-size:13px;color:#93998f}
+    @media(prefers-reduced-motion:no-preference){main{animation:appear .3s ease-out both}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true">W</div>
+    <div class="eyebrow">WARM HOME · 居家适老化评估平台</div>
+    <h1 id="title">正在连接网站…</h1>
+    <p id="message" role="status">正在检查云端服务器是否已开启，请稍候。</p>
+    <div class="actions">
+      <button id="retry" type="button" hidden>重新检查</button>
+      <a class="button" href="https://warmhome-demo.duckdns.org/">直接访问网站</a>
+    </div>
+    <p class="fine">此页面独立于 WARM HOME 云服务器运行。</p>
+  </main>
+  <script>
+    const destination='https://warmhome-demo.duckdns.org/';
+    const imageUrl='https://warmhome-demo.duckdns.org/app/home-draw-icon.png';
+    const title=document.getElementById('title');
+    const message=document.getElementById('message');
+    const retry=document.getElementById('retry');
+    let probeId=0;
+    function check(){
+      const id=++probeId;
+      retry.hidden=true;title.textContent='正在连接网站…';
+      message.textContent='正在检查云端服务器是否已开启，请稍候。';
+      const image=new Image();let finished=false;
+      const timer=setTimeout(()=>done(false),8000);
+      function done(online){
+        if(finished||id!==probeId)return;
+        finished=true;clearTimeout(timer);image.onload=image.onerror=null;
+        if(online){title.textContent='网站已开启';message.textContent='正在为你打开 WARM HOME。';location.replace(destination);}
+        else{title.textContent='云端服务器暂未开启';message.textContent='目前无法连接 WARM HOME。请在云服务器开启后，点击下方按钮重试。';retry.hidden=false;}
+      }
+      image.onload=()=>done(true);image.onerror=()=>done(false);
+      image.src=imageUrl+'?status-check='+Date.now();
+    }
+    retry.addEventListener('click',check);check();
+  </script>
+</body>
+</html>
+
